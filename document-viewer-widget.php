@@ -39,11 +39,12 @@ define( 'DV_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 
 // Load the Elementor widget
 function register_document_viewer_widget($widgets_manager) {
-
+	error_log('did it run successfully');
+	require_once(DV_PLUGIN_DIR_PATH . 'widgets/document-viewer-widget.php');
+	$widgets_manager->register_widget_type(new DV_Document_Viewer_Widget());
 
 }
-add_action('elementor/widgets/register', 'register_document_viewer_widget');
-
+add_action('elementor/widgets/widgets_registered', 'register_document_viewer_widget');
 // Enqueue necessary scripts and styles
 function document_viewer_widget_scripts() {
 	wp_enqueue_script('pdfobject', 'https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.7/pdfobject.min.js', array(), null, true);
