@@ -39,18 +39,32 @@ define( 'DV_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 
 // Load the Elementor widget
 function register_document_viewer_widget($widgets_manager) {
-	error_log('did it run successfully');
 	require_once(DV_PLUGIN_DIR_PATH . 'widgets/document-viewer-widget.php');
 	$widgets_manager->register_widget_type(new DV_Document_Viewer_Widget());
 
 }
 add_action('elementor/widgets/widgets_registered', 'register_document_viewer_widget');
 // Enqueue necessary scripts and styles
-function document_viewer_widget_scripts() {
-	wp_enqueue_script('pdfobject', 'https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.7/pdfobject.min.js', array(), null, true);
-	wp_enqueue_script('marked', 'https://cdn.jsdelivr.net/npm/marked/marked.min.js', array(), null, true);
-	wp_enqueue_script('mammoth', 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js', array(), null, true);
-	wp_enqueue_script('xlsx', 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js', array(), null, true);
+add_action('wp_enqueue_scripts', 'document_viewer_widget_enqueue_scripts');
+add_action('elementor/editor/after_enqueue_scripts', 'document_viewer_widget_enqueue_scripts');
+add_action('elementor/editor/after_enqueue_styles', 'document_viewer_widget_enqueue_styles');
+function document_viewer_widget_enqueue_scripts() {
+
+	wp_register_script('dv-pdfobject', DV_PLUGIN_DIR_URL .'assets/js/pdfobject.min.js', array(), '2.2.7', true);
+	wp_register_script('dv-marked', DV_PLUGIN_DIR_URL .'assets/js/marked.min.js', array(), '12.0.2', true);
+	wp_register_script('dv-mammoth', DV_PLUGIN_DIR_URL .'assets/js/mammoth.browser.min.js', array(), '1.4.2', true);
+	wp_register_script('dv-xlsx', DV_PLUGIN_DIR_URL .'assets/js/xlsx.full.min.js', array(), '0.17.0', true);
+
+	wp_enqueue_script('dv-pdfobject');
+	wp_enqueue_script('dv-marked');
+	wp_enqueue_script('dv-mammoth');
+	wp_enqueue_script('dv-xlsx');
+
 }
-add_action('wp_enqueue_scripts', 'document_viewer_widget_scripts');
+// Editor scripts
+
+function document_viewer_widget_enqueue_styles() {
+	wp_register_style('dv-style', DV_PLUGIN_DIR_URL .'assets/css/style.css', array(), DV_VERSION);
+	wp_enqueue_style('dv-style');
+}
 

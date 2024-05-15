@@ -1,0 +1,12 @@
+.dv-container .pdfobject-container {
+    max-height: 80vh;
+    height: 700px;
+    min-height: 400px;
+    border: 1px solid #ccc;
+}
+
+.dv-container .dv-btn-container {
+    margin: 30px auto 0;
+    text-align: center;
+
+}

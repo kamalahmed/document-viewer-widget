@@ -1,4 +1,7 @@
 <?php
+
+use Elementor\Controls_Manager;
+
 if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
@@ -24,19 +27,14 @@ class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
 	 * @inheritDoc
 	 */
 	public function get_script_depends() {
-		$scripts   = parent::get_script_depends();
-//		$scripts[] = 'handle';
 
-		return apply_filters( 'dv/elementor/scripts', $scripts );
+		return ['dv-pdfobject', 'dv-marked', 'dv-mammoth', 'dv-xlsx'];
 	}
 	/**
 	 * @inheritDoc
 	 */
 	public function get_style_depends() {
-		$styles   = parent::get_style_depends();
-//		$styles[] = 'csshandle';
-
-		return apply_filters( 'dv/elementor/styles', $styles );
+		return ['dv-style'];
 	}
 	/**
 	 * @inheritDoc
@@ -67,7 +65,7 @@ class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
 			'content_section',
 			[
 				'label' => __('Content', 'document-viewer-widget'),
-				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+				'tab' => Controls_Manager::TAB_CONTENT,
 			]
 		);
 
@@ -75,7 +73,7 @@ class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
 			'doc_type',
 			[
 				'label' => __('Document Type', 'document-viewer-widget'),
-				'type' => \Elementor\Controls_Manager::SELECT,
+				'type' => Controls_Manager::SELECT,
 				'options' => [
 					'pdf' => __('PDF', 'document-viewer-widget'),
 					'markdown' => __('Markdown', 'document-viewer-widget'),
@@ -90,7 +88,7 @@ class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
 			'document_file',
 			[
 				'label' => __('Upload Document', 'document-viewer-widget'),
-				'type' => \Elementor\Controls_Manager::MEDIA,
+				'type' => Controls_Manager::MEDIA,
 				'media_types' => [
 					'application/pdf',
 					'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -104,105 +102,120 @@ class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'show_document',
+			[
+				'label' => esc_html__( 'Render Document', 'document-viewer-widget' ),
+				'type' => Controls_Manager::SWITCHER,
+				'label_on' => esc_html__( 'Yes', 'document-viewer-widget' ),
+				'label_off' => esc_html__( 'No', 'document-viewer-widget' ),
+				'return_value' => 'yes',
+				'default' => 'yes',
+			]
+		);
+
+		$this->add_control(
+			'show_download_button',
+			[
+				'label' => esc_html__( 'Download Button', 'document-viewer-widget' ),
+				'type' => Controls_Manager::SWITCHER,
+				'label_on' => esc_html__( 'Show', 'document-viewer-widget' ),
+				'label_off' => esc_html__( 'Hide', 'document-viewer-widget' ),
+				'return_value' => 'yes',
+				'default' => 'yes',
+			]
+		);
+
+		$this->add_control(
+			'download_button_text',
+			[
+				'label' => esc_html__( 'Download Text', 'document-viewer-widget' ),
+				'type' => Controls_Manager::TEXT,
+                'label_block' => true,
+				'default' => esc_html__( 'Download the Document', 'document-viewer-widget' ),
+				'condition' => [
+					'show_download_button' => 'yes',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 		$doc_type = $settings['doc_type'];
+		$show_document = $settings['show_document']??'';
+		$show_download_button = $settings['show_download_button']??'';
+		$download_button_text = $settings['download_button_text']??'Download Document';
 		$doc_url = esc_url($settings['document_file']['url']);
+        $dom_id = "document-viewer-".md5($doc_url);
 
 		if ($doc_url) {
-			echo '<div id="document-viewer"></div>';
-			if ($doc_type === 'pdf') {
-				echo '<script>
+            ?>
+
+            <!--Placeholder for rendering the document-->
+            <div id="<?php echo esc_attr($dom_id); ?>"></div>
+
+            <?php
+
+			if ( 'yes' === $show_document ) {
+
+                ?>
+
+
+
+
+                <?php
+
+				echo '<div id="' . esc_html( $dom_id ) . '"></div>';
+
+
+				if ( $doc_type === 'pdf' ) {
+					echo '<script>
                     document.addEventListener("DOMContentLoaded", function() {
-                        PDFObject.embed("' . $doc_url . '", "#document-viewer");
+                        PDFObject.embed("' . $doc_url . '", "#' . $dom_id . '");
                     });
+                    
+                    
                 </script>';
-			} elseif ($doc_type === 'markdown') {
-				echo '<script>
+				} elseif ( $doc_type === 'markdown' ) {
+					echo '<script>
                     fetch("' . $doc_url . '")
                         .then(response => response.text())
                         .then(text => {
-                            document.getElementById("document-viewer").innerHTML = marked(text);
+                            document.getElementById("' . $dom_id . '").innerHTML = marked(text);
                         });
                 </script>';
-			} elseif ($doc_type === 'docx') {
-				echo '<script>
+				} elseif ( $doc_type === 'docx' ) {
+					echo '<script>
                     fetch("' . $doc_url . '")
                         .then(response => response.arrayBuffer())
                         .then(arrayBuffer => mammoth.convertToHtml({arrayBuffer: arrayBuffer}))
                         .then(result => {
-                            document.getElementById("document-viewer").innerHTML = result.value;
+                            document.getElementById("' . $dom_id . '").innerHTML = result.value;
                         })
                         .catch(error => console.log(error));
                 </script>';
-			} elseif ($doc_type === 'excel') {
-				echo '<script>
+				} elseif ( $doc_type === 'excel' ) {
+					echo '<script>
                     fetch("' . $doc_url . '")
                         .then(response => response.arrayBuffer())
                         .then(arrayBuffer => {
-                            var data = new Uint8Array(arrayBuffer);
-                            var workbook = XLSX.read(data, {type: "array"});
-                            var html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
-                            document.getElementById("document-viewer").innerHTML = html;
+                            let data = new Uint8Array(arrayBuffer);
+                            let workbook = XLSX.read(data, {type: "array"});
+                            let html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
+                            document.getElementById("' . $dom_id . '").innerHTML = html;
                         })
                         .catch(error => console.log(error));
                 </script>';
+				}
 			}
-			echo "<a href='$doc_url' target='_blank'>Or Download the Document</a><style>
-.pdfobject-container { max-height: 80vh; height: 700px; min-height: 400px; border: 1px solid #ccc; }
-</style>";
+			if ( 'yes' === $show_download_button ) {
+				echo "<p class='dv-btn-container'><a href='$doc_url' target='_blank'class='wp-block-file__button' download=''>$download_button_text</a></p>";
+            }
+
 		}
 	}
 
-	protected function x_content_template() {
-		?>
-        <#
-        if (settings.document_file.url) {
-        if (settings.doc_type === 'pdf') { #>
-        <div id="document-viewer"></div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                PDFObject.embed("{{ settings.document_file.url }}", "#document-viewer");
-            });
-        </script>
-        <# } else if (settings.doc_type === 'markdown') { #>
-        <div id="document-viewer"></div>
-        <script>
-            fetch("{{ settings.document_file.url }}")
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById("document-viewer").innerHTML = marked(text);
-                });
-        </script>
-        <# } else if (settings.doc_type === 'docx') { #>
-        <div id="document-viewer"></div>
-        <script>
-            fetch("{{ settings.document_file.url }}")
-                .then(response => response.arrayBuffer())
-                .then(arrayBuffer => mammoth.convertToHtml({arrayBuffer: arrayBuffer}))
-                .then(result => {
-                    document.getElementById("document-viewer").innerHTML = result.value;
-                })
-                .catch(error => console.log(error));
-        </script>
-        <# } else if (settings.doc_type === 'excel') { #>
-        <div id="document-viewer"></div>
-        <script>
-            fetch("{{ settings.document_file.url }}")
-                .then(response => response.arrayBuffer())
-                .then(arrayBuffer => {
-                    var data = new Uint8Array(arrayBuffer);
-                    var workbook = XLSX.read(data, {type: "array"});
-                    var html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
-                    document.getElementById("document-viewer").innerHTML = html;
-                })
-                .catch(error => console.log(error));
-        </script>
-        <# }
-        } #>
-		<?php
-	}
 }
