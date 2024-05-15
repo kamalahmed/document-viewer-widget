@@ -9,39 +9,39 @@ if (!defined('ABSPATH')) {
 
 class DV_Document_Viewer_Widget extends Widget_Base {
 
-	public function get_name() {
+	public function get_name(): string {
 		return 'document-viewer';
 	}
 
-	public function get_title() {
+	public function get_title(): ?string {
 		return __('Document Viewer', 'document-viewer-widget');
 	}
 
-	public function get_icon() {
+	public function get_icon(): string {
 		return 'eicon-document-file';
 	}
 
-	public function get_categories() {
+	public function get_categories(): array {
 		return ['general'];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function get_script_depends() {
+	public function get_script_depends(): array {
 		return ['dv-pdfobject', 'dv-marked', 'dv-mammoth', 'dv-xlsx'];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function get_style_depends() {
+	public function get_style_depends(): array {
 		return ['dv-style'];
 	}
 	/**
 	 * @inheritDoc
 	 */
-	public function get_keywords() {
+	public function get_keywords(): array {
 		return [
 			'pdf',
 			'dv',
@@ -153,6 +153,8 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 		$doc_url = esc_url($settings['document_file']['url']);
         $dom_id = "document-viewer-".md5($doc_url);
 
+
+
 		if ($doc_url) {
             echo '<div class="dv-container">'; // HTML container starts
 			if ( 'yes' === $show_document ) {
@@ -163,13 +165,17 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 
 				<?php
 				if ( $doc_type === 'pdf' ) {
-					echo '<script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        PDFObject.embed("' . $doc_url . '", "#' . $dom_id . '");
-                    });
-                    
-                    
-                </script>';
+                    ?>
+                    <script>
+	                    <?php if ( is_admin() ) { ?>
+                            PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
+                        <?php } else { ?>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
+                        });
+                        <?php } ?>
+                    </script>
+                        <?php
 				} elseif ( $doc_type === 'markdown' ) {
 					echo '<script>
                     fetch("' . $doc_url . '")
@@ -191,6 +197,18 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 				} elseif ( $doc_type === 'excel' ) {
                     ?>
                     <script>
+	                    <?php if ( is_admin() ) {?>
+                        fetch("<?php echo esc_js($doc_url); ?>")
+                            .then(response => response.arrayBuffer())
+                            .then(arrayBuffer => {
+                                let data = new Uint8Array(arrayBuffer);
+                                let workbook = XLSX.read(data, {type: "array"});
+                                let html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
+                                document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = html;
+                            })
+                            .catch(error => console.log(error));
+	                   <?php } else { ?>
+
                         document.addEventListener("DOMContentLoaded", function() {
                             fetch("<?php echo esc_js($doc_url); ?>")
                                 .then(response => response.arrayBuffer())
@@ -202,13 +220,14 @@ class DV_Document_Viewer_Widget extends Widget_Base {
                                 })
                                 .catch(error => console.log(error));
                         });
+	                    <?php } ?>
                     </script>
                     <?php
 
 				}
 			}
 			if ( 'yes' === $show_download_button ) {
-				echo "<p class='dv-btn-container'><a href='$doc_url' target='_blank'class='wp-block-file__button' download=''>$download_button_text</a></p>";
+				echo "<p class='dv-btn-container'><a href='$doc_url' target='_blank' class='wp-block-file__button' download=''>$download_button_text</a></p>";
             }
             echo '</div>'; // closing .container
 		}
