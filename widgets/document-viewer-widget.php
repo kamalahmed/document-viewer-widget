@@ -189,17 +189,22 @@ class DV_Document_Viewer_Widget extends Widget_Base {
                         .catch(error => console.log(error));
                 </script>';
 				} elseif ( $doc_type === 'excel' ) {
-					echo '<script>
-                    fetch("' . $doc_url . '")
-                        .then(response => response.arrayBuffer())
-                        .then(arrayBuffer => {
-                            let data = new Uint8Array(arrayBuffer);
-                            let workbook = XLSX.read(data, {type: "array"});
-                            let html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
-                            document.getElementById("' . $dom_id . '").innerHTML = html;
-                        })
-                        .catch(error => console.log(error));
-                </script>';
+                    ?>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            fetch("<?php echo esc_js($doc_url); ?>")
+                                .then(response => response.arrayBuffer())
+                                .then(arrayBuffer => {
+                                    let data = new Uint8Array(arrayBuffer);
+                                    let workbook = XLSX.read(data, {type: "array"});
+                                    let html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
+                                    document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = html;
+                                })
+                                .catch(error => console.log(error));
+                        });
+                    </script>
+                    <?php
+
 				}
 			}
 			if ( 'yes' === $show_download_button ) {
