@@ -24,13 +24,14 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 	public function get_categories() {
 		return ['general'];
 	}
+
 	/**
 	 * @inheritDoc
 	 */
 	public function get_script_depends() {
-
 		return ['dv-pdfobject', 'dv-marked', 'dv-mammoth', 'dv-xlsx'];
 	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -153,25 +154,14 @@ class DV_Document_Viewer_Widget extends Widget_Base {
         $dom_id = "document-viewer-".md5($doc_url);
 
 		if ($doc_url) {
-            ?>
-
-            <!--Placeholder for rendering the document-->
-            <div id="<?php echo esc_attr($dom_id); ?>"></div>
-
-            <?php
-
+            echo '<div class="dv-container">'; // HTML container starts
 			if ( 'yes' === $show_document ) {
+				?>
 
-                ?>
+                <!--Placeholder for rendering the document-->
+                <div id="<?php echo esc_attr($dom_id); ?>"></div>
 
-
-
-
-                <?php
-
-				echo '<div id="' . esc_html( $dom_id ) . '"></div>';
-
-
+				<?php
 				if ( $doc_type === 'pdf' ) {
 					echo '<script>
                     document.addEventListener("DOMContentLoaded", function() {
@@ -215,7 +205,7 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 			if ( 'yes' === $show_download_button ) {
 				echo "<p class='dv-btn-container'><a href='$doc_url' target='_blank'class='wp-block-file__button' download=''>$download_button_text</a></p>";
             }
-
+            echo '</div>'; // closing .container
 		}
 	}
 

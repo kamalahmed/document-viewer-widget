@@ -1,15 +1,21 @@
 <?php
 
 /*
-Plugin Name: Document Viewer Widget for Elementor
-Plugin URI: https://github.com/kamalahmed/document-viewer-widget
-Description: A custom Elementor widget to upload and display PDF, Markdown, DOCX, and Excel files.
-Version: 1.0.0
-Author: Kamal Ahmed
-Author URI: http://github.com/kamalahmed
-License: GPLv3 or later
-Text Domain: document-viewer-widget
+ * Plugin Name: Document Viewer Widget for Elementor
+ * Plugin URI: https://github.com/kamalahmed/document-viewer-widget
+ * Description: A custom Elementor widget to upload and display PDF, Markdown, DOCX, and Excel files.
+ * Version: 1.0.0
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
+ * Author: Kamal Ahmed
+ * Author URI: http://github.com/kamalahmed
+ * License: GPLv3 or later
+ * Text Domain: document-viewer-widget
+ * Requires Plugins: elementor
+ * Elementor tested up to: 3.21.0
+ * Elementor Pro tested up to: 3.21.0
 */
+
 
 /*
 This program is free software; you can redistribute it and/or
@@ -30,7 +36,7 @@ Copyright 2024 KamalAhmed.
 */
 
 // Make sure we don't expose any info if called directly
-defined('ABSPATH') || die('Direct Access is not allowed!');
+defined( 'ABSPATH' ) || die( 'Direct Access is not allowed!' );
 
 const DV_VERSION = '1.0.0';
 
@@ -38,36 +44,22 @@ define( 'DV_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'DV_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 
 // Load the Elementor widget
-function register_document_viewer_widget($widgets_manager) {
-	require_once(DV_PLUGIN_DIR_PATH . 'widgets/document-viewer-widget.php');
-	$widgets_manager->register_widget_type(new DV_Document_Viewer_Widget());
-
-}
-add_action('elementor/widgets/widgets_registered', 'register_document_viewer_widget');
-// Enqueue necessary scripts and styles
-add_action('wp_enqueue_scripts', 'document_viewer_widget_register_scripts');
-add_action('elementor/editor/after_enqueue_scripts', 'document_viewer_widget_enqueue_scripts');
-add_action('elementor/editor/after_enqueue_styles', 'document_viewer_widget_enqueue_styles');
-
-function document_viewer_widget_register_scripts() {
-	//Script
-	wp_register_script('dv-pdfobject', DV_PLUGIN_DIR_URL .'assets/js/pdfobject.min.js', array(), '2.2.7', true);
-	wp_register_script('dv-marked', DV_PLUGIN_DIR_URL .'assets/js/marked.min.js', array(), '12.0.2', true);
-	wp_register_script('dv-mammoth', DV_PLUGIN_DIR_URL .'assets/js/mammoth.browser.min.js', array(), '1.4.2', true);
-	wp_register_script('dv-xlsx', DV_PLUGIN_DIR_URL .'assets/js/xlsx.full.min.js', array(), '0.17.0', true);
-	//Style
-	wp_register_style('dv-style', DV_PLUGIN_DIR_URL .'assets/css/style.css', array(), DV_VERSION);
-}
-function document_viewer_widget_enqueue_scripts(): void {
-	wp_enqueue_script('dv-pdfobject');
-	wp_enqueue_script('dv-marked');
-	wp_enqueue_script('dv-mammoth');
-	wp_enqueue_script('dv-xlsx');
-
-}
-// Editor scripts
-
-function document_viewer_widget_enqueue_styles(): void {
-	wp_enqueue_style('dv-style');
+function register_document_viewer_widget( $widgets_manager ): void {
+	require_once( DV_PLUGIN_DIR_PATH . 'widgets/document-viewer-widget.php' );
+	$widgets_manager->register( new DV_Document_Viewer_Widget() );
 }
 
+add_action( 'elementor/widgets/register', 'register_document_viewer_widget' );
+
+// Register necessary scripts and styles
+function document_viewer_widget_register_scripts(): void {
+	// Scripts
+	wp_register_script( 'dv-pdfobject', DV_PLUGIN_DIR_URL . 'assets/js/pdfobject.min.js', [], '2.2.7', true );
+	wp_register_script( 'dv-marked', DV_PLUGIN_DIR_URL . 'assets/js/marked.min.js', [], '12.0.2', true );
+	wp_register_script( 'dv-mammoth', DV_PLUGIN_DIR_URL . 'assets/js/mammoth.browser.min.js', [], '1.4.2', true );
+	wp_register_script( 'dv-xlsx', DV_PLUGIN_DIR_URL . 'assets/js/xlsx.full.min.js', [], '0.17.0', true );
+	// Styles
+	wp_register_style( 'dv-style', DV_PLUGIN_DIR_URL . 'assets/css/style.css', [], DV_VERSION );
+}
+
+add_action( 'wp_enqueue_scripts', 'document_viewer_widget_register_scripts' );

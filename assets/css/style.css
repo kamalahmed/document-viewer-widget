@@ -10,3 +10,10 @@
     text-align: center;
 
 }
+.dv-container .dv-btn-container a.wp-block-file__button{
+    padding: 10px;
+    background: blue;
+    color: #fff;
+    border-radius: 5px;
+}
+
