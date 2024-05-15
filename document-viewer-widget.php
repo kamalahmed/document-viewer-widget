@@ -45,16 +45,20 @@ function register_document_viewer_widget($widgets_manager) {
 }
 add_action('elementor/widgets/widgets_registered', 'register_document_viewer_widget');
 // Enqueue necessary scripts and styles
-add_action('wp_enqueue_scripts', 'document_viewer_widget_enqueue_scripts');
+add_action('wp_enqueue_scripts', 'document_viewer_widget_register_scripts');
 add_action('elementor/editor/after_enqueue_scripts', 'document_viewer_widget_enqueue_scripts');
 add_action('elementor/editor/after_enqueue_styles', 'document_viewer_widget_enqueue_styles');
-function document_viewer_widget_enqueue_scripts() {
 
+function document_viewer_widget_register_scripts() {
+	//Script
 	wp_register_script('dv-pdfobject', DV_PLUGIN_DIR_URL .'assets/js/pdfobject.min.js', array(), '2.2.7', true);
 	wp_register_script('dv-marked', DV_PLUGIN_DIR_URL .'assets/js/marked.min.js', array(), '12.0.2', true);
 	wp_register_script('dv-mammoth', DV_PLUGIN_DIR_URL .'assets/js/mammoth.browser.min.js', array(), '1.4.2', true);
 	wp_register_script('dv-xlsx', DV_PLUGIN_DIR_URL .'assets/js/xlsx.full.min.js', array(), '0.17.0', true);
-
+	//Style
+	wp_register_style('dv-style', DV_PLUGIN_DIR_URL .'assets/css/style.css', array(), DV_VERSION);
+}
+function document_viewer_widget_enqueue_scripts(): void {
 	wp_enqueue_script('dv-pdfobject');
 	wp_enqueue_script('dv-marked');
 	wp_enqueue_script('dv-mammoth');
@@ -63,8 +67,7 @@ function document_viewer_widget_enqueue_scripts() {
 }
 // Editor scripts
 
-function document_viewer_widget_enqueue_styles() {
-	wp_register_style('dv-style', DV_PLUGIN_DIR_URL .'assets/css/style.css', array(), DV_VERSION);
+function document_viewer_widget_enqueue_styles(): void {
 	wp_enqueue_style('dv-style');
 }
 

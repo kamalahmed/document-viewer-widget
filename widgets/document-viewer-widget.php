@@ -1,12 +1,13 @@
 <?php
 
 use Elementor\Controls_Manager;
+use Elementor\Widget_Base;
 
 if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
+class DV_Document_Viewer_Widget extends Widget_Base {
 
 	public function get_name() {
 		return 'document-viewer';
@@ -17,7 +18,7 @@ class DV_Document_Viewer_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-file';
+		return 'eicon-document-file';
 	}
 
 	public function get_categories() {
