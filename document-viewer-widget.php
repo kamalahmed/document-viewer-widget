@@ -114,6 +114,10 @@ final class Document_Viewer_Widget {
 	 */
 	public function init() {
 		$this->define_constants();
+
+		add_filter('upload_mimes', [$this, 'dv_add_md_mime_type']);
+
+		add_filter('wp_check_filetype_and_ext', [$this, 'dv_check_md_file_type'], 10, 4);
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts_and_styles' ] );
 		add_action( 'elementor/widgets/register', [ $this, 'register_widgets' ] );
 	}
@@ -122,6 +126,24 @@ final class Document_Viewer_Widget {
 	protected function define_constants() {
 		define( 'DV_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
 		define( 'DV_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
+	}
+
+	// Add support for .md files
+	function dv_add_md_mime_type($mime_types) {
+		$mime_types['md'] = 'text/markdown'; // Adding .md extension
+		return $mime_types;
+	}
+
+	// Check file type and extension
+	function dv_check_md_file_type($data, $file, $filename, $mimes) {
+		$filetype = wp_check_filetype($filename, $mimes);
+
+		if ($filetype['ext'] === 'md') {
+			$data['ext'] = 'md';
+			$data['type'] = 'text/markdown';
+		}
+
+		return $data;
 	}
 
 	public function register_widgets( $widgets_manager ) {

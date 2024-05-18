@@ -38,6 +38,7 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 	public function get_style_depends(): array {
 		return ['dv-style'];
 	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -58,7 +59,6 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 			'microsoft',
 			'ms doc',
 			'ms docx',
-
 		];
 	}
 
@@ -107,10 +107,10 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 		$this->add_control(
 			'show_document',
 			[
-				'label' => esc_html__( 'Render Document', 'document-viewer-widget' ),
+				'label' => esc_html__('Render Document', 'document-viewer-widget'),
 				'type' => Controls_Manager::SWITCHER,
-				'label_on' => esc_html__( 'Yes', 'document-viewer-widget' ),
-				'label_off' => esc_html__( 'No', 'document-viewer-widget' ),
+				'label_on' => esc_html__('Yes', 'document-viewer-widget'),
+				'label_off' => esc_html__('No', 'document-viewer-widget'),
 				'return_value' => 'yes',
 				'default' => 'yes',
 			]
@@ -119,10 +119,10 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 		$this->add_control(
 			'show_download_button',
 			[
-				'label' => esc_html__( 'Download Button', 'document-viewer-widget' ),
+				'label' => esc_html__('Download Button', 'document-viewer-widget'),
 				'type' => Controls_Manager::SWITCHER,
-				'label_on' => esc_html__( 'Show', 'document-viewer-widget' ),
-				'label_off' => esc_html__( 'Hide', 'document-viewer-widget' ),
+				'label_on' => esc_html__('Show', 'document-viewer-widget'),
+				'label_off' => esc_html__('Hide', 'document-viewer-widget'),
 				'return_value' => 'yes',
 				'default' => 'yes',
 			]
@@ -131,10 +131,10 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 		$this->add_control(
 			'download_button_text',
 			[
-				'label' => esc_html__( 'Download Text', 'document-viewer-widget' ),
+				'label' => esc_html__('Download Text', 'document-viewer-widget'),
 				'type' => Controls_Manager::TEXT,
-                'label_block' => true,
-				'default' => esc_html__( 'Download the Document', 'document-viewer-widget' ),
+				'label_block' => true,
+				'default' => esc_html__('Download the Document', 'document-viewer-widget'),
 				'condition' => [
 					'show_download_button' => 'yes',
 				],
@@ -147,57 +147,55 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 		$doc_type = $settings['doc_type'];
-		$show_document = $settings['show_document']??'';
-		$show_download_button = $settings['show_download_button']??'';
-		$download_button_text = $settings['download_button_text']??'Download Document';
+		$show_document = $settings['show_document'] ?? '';
+		$show_download_button = $settings['show_download_button'] ?? '';
+		$download_button_text = $settings['download_button_text'] ?? 'Download Document';
 		$doc_url = esc_url($settings['document_file']['url']);
-        $dom_id = "document-viewer-".md5($doc_url);
-
-
+		$dom_id = "document-viewer-" . md5($doc_url);
 
 		if ($doc_url) {
-            echo '<div class="dv-container">'; // HTML container starts
-			if ( 'yes' === $show_document ) {
+			echo '<div class="dv-container">'; // HTML container starts
+			if ('yes' === $show_document) {
 				?>
 
                 <!--Placeholder for rendering the document-->
                 <div id="<?php echo esc_attr($dom_id); ?>"></div>
 
 				<?php
-				if ( $doc_type === 'pdf' ) {
-                    ?>
+				if ($doc_type === 'pdf') {
+					?>
                     <script>
-	                    <?php if ( is_admin() ) { ?>
-                            PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
-                        <?php } else { ?>
+						<?php if (is_admin()) { ?>
+                        PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
+						<?php } else { ?>
                         document.addEventListener("DOMContentLoaded", function() {
                             PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
                         });
-                        <?php } ?>
+						<?php } ?>
                     </script>
-                        <?php
-				} elseif ( $doc_type === 'markdown' ) {
+					<?php
+				} elseif ($doc_type === 'markdown') {
 					echo '<script>
-                    fetch("' . $doc_url . '")
-                        .then(response => response.text())
-                        .then(text => {
-                            document.getElementById("' . $dom_id . '").innerHTML = marked(text);
-                        });
-                </script>';
-				} elseif ( $doc_type === 'docx' ) {
+						fetch("' . $doc_url . '")
+							.then(response => response.text())
+							.then(text => {
+								document.getElementById("' . $dom_id . '").innerHTML = marked(text);
+							});
+					</script>';
+				} elseif ($doc_type === 'docx') {
 					echo '<script>
-                    fetch("' . $doc_url . '")
-                        .then(response => response.arrayBuffer())
-                        .then(arrayBuffer => mammoth.convertToHtml({arrayBuffer: arrayBuffer}))
-                        .then(result => {
-                            document.getElementById("' . $dom_id . '").innerHTML = result.value;
-                        })
-                        .catch(error => console.log(error));
-                </script>';
-				} elseif ( $doc_type === 'excel' ) {
-                    ?>
+						fetch("' . $doc_url . '")
+							.then(response => response.arrayBuffer())
+							.then(arrayBuffer => mammoth.convertToHtml({arrayBuffer: arrayBuffer}))
+							.then(result => {
+								document.getElementById("' . $dom_id . '").innerHTML = result.value;
+							})
+							.catch(error => console.log(error));
+					</script>';
+				} elseif ($doc_type === 'excel') {
+					?>
                     <script>
-	                    <?php if ( is_admin() ) {?>
+						<?php if (is_admin()) {?>
                         fetch("<?php echo esc_js($doc_url); ?>")
                             .then(response => response.arrayBuffer())
                             .then(arrayBuffer => {
@@ -207,8 +205,7 @@ class DV_Document_Viewer_Widget extends Widget_Base {
                                 document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = html;
                             })
                             .catch(error => console.log(error));
-	                   <?php } else { ?>
-
+						<?php } else { ?>
                         document.addEventListener("DOMContentLoaded", function() {
                             fetch("<?php echo esc_js($doc_url); ?>")
                                 .then(response => response.arrayBuffer())
@@ -220,17 +217,15 @@ class DV_Document_Viewer_Widget extends Widget_Base {
                                 })
                                 .catch(error => console.log(error));
                         });
-	                    <?php } ?>
+						<?php } ?>
                     </script>
-                    <?php
-
+					<?php
 				}
 			}
-			if ( 'yes' === $show_download_button ) {
+			if ('yes' === $show_download_button) {
 				echo "<p class='dv-btn-container'><a href='$doc_url' target='_blank' class='wp-block-file__button' download=''>$download_button_text</a></p>";
-            }
-            echo '</div>'; // closing .container
+			}
+			echo '</div>'; // closing .container
 		}
 	}
-
 }
