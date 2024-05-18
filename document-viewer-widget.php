@@ -14,8 +14,7 @@
  * Requires Plugins: elementor
  * Elementor tested up to: 3.21.0
  * Elementor Pro tested up to: 3.21.0
-*/
-
+ */
 
 /*
 This program is free software; you can redistribute it and/or
@@ -68,7 +67,7 @@ final class Document_Viewer_Widget {
 	/**
 	 * Constructor
 	 *
-	 * Perform some compatibility checks to make sure basic requirements are meet.
+	 * Perform some compatibility checks to make sure basic requirements are met.
 	 * If all compatibility checks pass, initialize the functionality.
 	 *
 	 * @since 1.0.0
@@ -83,6 +82,7 @@ final class Document_Viewer_Widget {
 		}
 
 	}
+
 	/**
 	 * Instance
 	 *
@@ -116,13 +116,12 @@ final class Document_Viewer_Widget {
 		$this->define_constants();
 
 		add_filter('upload_mimes', [$this, 'dv_add_md_mime_type']);
-
 		add_filter('wp_check_filetype_and_ext', [$this, 'dv_check_md_file_type'], 10, 4);
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts_and_styles' ] );
 		add_action('elementor/editor/after_enqueue_scripts', [$this, 'register_scripts_and_styles']);
-		add_action( 'elementor/widgets/register', [ $this, 'register_widgets' ] );
+		add_action( 'elementor/widgets/register', [ $this, 'register_elementor_widget' ] );
+		add_action('init', [$this, 'register_gutenberg_block']);
 	}
-
 
 	protected function define_constants() {
 		define( 'DV_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
@@ -130,13 +129,13 @@ final class Document_Viewer_Widget {
 	}
 
 	// Add support for .md files
-	function dv_add_md_mime_type($mime_types) {
+	public function dv_add_md_mime_type($mime_types) {
 		$mime_types['md'] = 'text/markdown'; // Adding .md extension
 		return $mime_types;
 	}
 
 	// Check file type and extension
-	function dv_check_md_file_type($data, $file, $filename, $mimes) {
+	public function dv_check_md_file_type($data, $file, $filename, $mimes) {
 		$filetype = wp_check_filetype($filename, $mimes);
 
 		if ($filetype['ext'] === 'md') {
@@ -147,9 +146,13 @@ final class Document_Viewer_Widget {
 		return $data;
 	}
 
-	public function register_widgets( $widgets_manager ) {
+	public function register_elementor_widget( $widgets_manager ) {
 		require_once( DV_PLUGIN_DIR_PATH . 'widgets/document-viewer-widget.php' );
 		$widgets_manager->register( new DV_Document_Viewer_Widget() );
+	}
+
+	public function register_gutenberg_block() {
+		register_block_type( DV_PLUGIN_DIR_PATH . 'document-viewer/build/block.json' );
 	}
 
 	public function register_scripts_and_styles() {
@@ -158,10 +161,12 @@ final class Document_Viewer_Widget {
 		wp_register_script( 'dv-marked', DV_PLUGIN_DIR_URL . 'assets/js/marked.min.js', [], '12.0.2', true );
 		wp_register_script( 'dv-mammoth', DV_PLUGIN_DIR_URL . 'assets/js/mammoth.browser.min.js', [], '1.4.2', true );
 		wp_register_script( 'dv-xlsx', DV_PLUGIN_DIR_URL . 'assets/js/xlsx.full.min.js', [], '0.17.0', true );
-		// Styles
-		wp_register_style( 'dv-style', DV_PLUGIN_DIR_URL . 'assets/css/style.css', [], self::DV_VERSION );
-	}
+		wp_register_script( 'dv-view', DV_PLUGIN_DIR_URL . 'document-viewer/build/view.js', [], self::DV_VERSION, true );
 
+		wp_register_style( 'dv-style', DV_PLUGIN_DIR_URL . 'assets/css/style.css', [], self::DV_VERSION );
+		wp_enqueue_script( 'dv-view' );
+		wp_enqueue_style( 'dv-style' );
+	}
 
 	/**
 	 * Compatibility Checks
@@ -268,11 +273,8 @@ final class Document_Viewer_Widget {
 
 }
 
-
-// run the plugin after elementor has loaded.
+// Run the plugin after Elementor has loaded.
 function document_viewer_init() {
-
 	Document_Viewer_Widget::instance();
-
 }
 add_action( 'plugins_loaded', 'document_viewer_init' );

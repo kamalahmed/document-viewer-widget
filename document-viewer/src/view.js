@@ -20,6 +20,43 @@
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script
  */
 
-/* eslint-disable no-console */
-console.log( 'Hello World! (from create-block-document-viewer block)' );
-/* eslint-enable no-console */
+(function() {
+	function renderDocument() {
+		const containers = document.querySelectorAll('.dv-container');
+		containers.forEach(container => {
+			const docType = container.getAttribute('data-doc-type');
+			const docUrl = container.getAttribute('data-doc-url');
+			const domId = container.id;
+
+			if (docType === 'pdf') {
+				PDFObject.embed(docUrl, `#${domId}`);
+			} else if (docType === 'markdown') {
+				fetch(docUrl)
+					.then(response => response.text())
+					.then(text => {
+						container.innerHTML = marked.parse(text);
+					});
+			} else if (docType === 'docx') {
+				fetch(docUrl)
+					.then(response => response.arrayBuffer())
+					.then(arrayBuffer => mammoth.convertToHtml({ arrayBuffer }))
+					.then(result => {
+						container.innerHTML = result.value;
+					})
+					.catch(console.error);
+			} else if (docType === 'excel') {
+				fetch(docUrl)
+					.then(response => response.arrayBuffer())
+					.then(arrayBuffer => {
+						const data = new Uint8Array(arrayBuffer);
+						const workbook = XLSX.read(data, { type: 'array' });
+						const html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
+						container.innerHTML = html;
+					})
+					.catch(console.error);
+			}
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', renderDocument);
+})();

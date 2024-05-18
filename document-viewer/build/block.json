@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "title": "Document Viewer",
   "category": "widgets",
-  "icon": "smiley",
-  "description": "Example block scaffolded with Create Block tool.",
+  "icon": "media-document",
+  "description": "A block to view documents such as PDF, Markdown, DOCX, and Excel.",
   "example": {},
   "supports": {
     "html": false
@@ -15,5 +15,23 @@
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
-  "viewScript": "file:./view.js"
+  "viewScript": "file:./view.js",
+  "attributes": {
+    "docType": {
+      "type": "string",
+      "default": "pdf"
+    },
+    "docUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "showDownloadButton": {
+      "type": "boolean",
+      "default": true
+    },
+    "downloadButtonText": {
+      "type": "string",
+      "default": "Download the Document"
+    }
+  }
 }

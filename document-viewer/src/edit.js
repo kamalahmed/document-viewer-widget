@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls, MediaUpload } from '@wordpress/block-editor';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -21,21 +21,59 @@ import { useBlockProps } from '@wordpress/block-editor';
  */
 import './editor.scss';
 
-/**
- * The edit function describes the structure of your block in the context of the
- * editor. This represents what the editor will render when the block is used.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
- *
- * @return {Element} Element to render.
- */
-export default function Edit() {
+import { PanelBody, SelectControl, ToggleControl, TextControl, Button } from '@wordpress/components';
+
+const Edit = ({ attributes, setAttributes }) => {
+	const { docType, docUrl, showDownloadButton, downloadButtonText } = attributes;
+
 	return (
-		<p { ...useBlockProps() }>
-			{ __(
-				'Document Viewer – hello from the editor!',
-				'document-viewer'
-			) }
-		</p>
+		<>
+			<InspectorControls>
+				<PanelBody title={__('Document Viewer Settings', 'document-viewer')}>
+					<SelectControl
+						label={__('Document Type', 'document-viewer')}
+						value={docType}
+						options={[
+							{ label: __('PDF', 'document-viewer'), value: 'pdf' },
+							{ label: __('Markdown', 'document-viewer'), value: 'markdown' },
+							{ label: __('DOCX', 'document-viewer'), value: 'docx' },
+							{ label: __('Excel', 'document-viewer'), value: 'excel' }
+						]}
+						onChange={(newDocType) => setAttributes({ docType: newDocType })}
+					/>
+					<MediaUpload
+						onSelect={(media) => setAttributes({ docUrl: media.url })}
+						allowedTypes={[
+							'application/pdf',
+							'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+							'text/markdown',
+							'text/plain'
+						]}
+						render={({ open }) => (
+							<Button onClick={open} isPrimary>{__('Select Document', 'document-viewer')}</Button>
+						)}
+					/>
+					<ToggleControl
+						label={__('Show Download Button', 'document-viewer')}
+						checked={showDownloadButton}
+						onChange={(newShowDownloadButton) => setAttributes({ showDownloadButton: newShowDownloadButton })}
+					/>
+					{showDownloadButton && (
+						<TextControl
+							label={__('Download Button Text', 'document-viewer')}
+							value={downloadButtonText}
+							onChange={(newDownloadButtonText) => setAttributes({ downloadButtonText: newDownloadButtonText })}
+						/>
+					)}
+				</PanelBody>
+			</InspectorControls>
+			<div { ...useBlockProps() }>
+				{__('Document Viewer', 'document-viewer')}
+				{docUrl && <p>{__('Document URL:', 'document-viewer')} {docUrl}</p>}
+			</div>
+		</>
 	);
-}
+};
+
+export default Edit;
