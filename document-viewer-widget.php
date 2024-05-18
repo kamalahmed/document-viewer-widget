@@ -161,10 +161,8 @@ final class Document_Viewer_Widget {
 		wp_register_script( 'dv-marked', DV_PLUGIN_DIR_URL . 'assets/js/marked.min.js', [], '12.0.2', true );
 		wp_register_script( 'dv-mammoth', DV_PLUGIN_DIR_URL . 'assets/js/mammoth.browser.min.js', [], '1.4.2', true );
 		wp_register_script( 'dv-xlsx', DV_PLUGIN_DIR_URL . 'assets/js/xlsx.full.min.js', [], '0.17.0', true );
-		wp_register_script( 'dv-view', DV_PLUGIN_DIR_URL . 'document-viewer/build/view.js', [], self::DV_VERSION, true );
 
 		wp_register_style( 'dv-style', DV_PLUGIN_DIR_URL . 'assets/css/style.css', [], self::DV_VERSION );
-		wp_enqueue_script( 'dv-view' );
 		wp_enqueue_style( 'dv-style' );
 	}
 
