@@ -119,6 +119,7 @@ final class Document_Viewer_Widget {
 
 		add_filter('wp_check_filetype_and_ext', [$this, 'dv_check_md_file_type'], 10, 4);
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts_and_styles' ] );
+		add_action('elementor/editor/after_enqueue_scripts', [$this, 'register_scripts_and_styles']);
 		add_action( 'elementor/widgets/register', [ $this, 'register_widgets' ] );
 	}
 

@@ -157,56 +157,34 @@ class DV_Document_Viewer_Widget extends Widget_Base {
 			echo '<div class="dv-container">'; // HTML container starts
 			if ('yes' === $show_document) {
 				?>
-
-                <!--Placeholder for rendering the document-->
+                <!-- Placeholder for rendering the document -->
                 <div id="<?php echo esc_attr($dom_id); ?>"></div>
-
-				<?php
-				if ($doc_type === 'pdf') {
-					?>
-                    <script>
-						<?php if (is_admin()) { ?>
-                        PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
-						<?php } else { ?>
-                        document.addEventListener("DOMContentLoaded", function() {
+                <script>
+                    (function() {
+                        function embedPDF() {
                             PDFObject.embed("<?php echo esc_js($doc_url); ?>", "#<?php echo esc_js($dom_id); ?>");
-                        });
-						<?php } ?>
-                    </script>
-					<?php
-				} elseif ($doc_type === 'markdown') {
-					echo '<script>
-						fetch("' . $doc_url . '")
-							.then(response => response.text())
-							.then(text => {
-								document.getElementById("' . $dom_id . '").innerHTML = marked(text);
-							});
-					</script>';
-				} elseif ($doc_type === 'docx') {
-					echo '<script>
-						fetch("' . $doc_url . '")
-							.then(response => response.arrayBuffer())
-							.then(arrayBuffer => mammoth.convertToHtml({arrayBuffer: arrayBuffer}))
-							.then(result => {
-								document.getElementById("' . $dom_id . '").innerHTML = result.value;
-							})
-							.catch(error => console.log(error));
-					</script>';
-				} elseif ($doc_type === 'excel') {
-					?>
-                    <script>
-						<?php if (is_admin()) {?>
-                        fetch("<?php echo esc_js($doc_url); ?>")
-                            .then(response => response.arrayBuffer())
-                            .then(arrayBuffer => {
-                                let data = new Uint8Array(arrayBuffer);
-                                let workbook = XLSX.read(data, {type: "array"});
-                                let html = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]]);
-                                document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = html;
-                            })
-                            .catch(error => console.log(error));
-						<?php } else { ?>
-                        document.addEventListener("DOMContentLoaded", function() {
+                        }
+
+                        function renderMarkdown() {
+                            fetch("<?php echo esc_js($doc_url); ?>")
+                                .then(response => response.text())
+                                .then(text => {
+                                    let markdownParsed = marked.parse(text); // Use marked.parse
+                                    document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = markdownParsed;
+                                });
+                        }
+
+                        function renderDocx() {
+                            fetch("<?php echo esc_js($doc_url); ?>")
+                                .then(response => response.arrayBuffer())
+                                .then(arrayBuffer => mammoth.convertToHtml({arrayBuffer: arrayBuffer}))
+                                .then(result => {
+                                    document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = result.value;
+                                })
+                                .catch(error => console.log(error));
+                        }
+
+                        function renderExcel() {
                             fetch("<?php echo esc_js($doc_url); ?>")
                                 .then(response => response.arrayBuffer())
                                 .then(arrayBuffer => {
@@ -216,11 +194,36 @@ class DV_Document_Viewer_Widget extends Widget_Base {
                                     document.getElementById("<?php echo esc_js($dom_id); ?>").innerHTML = html;
                                 })
                                 .catch(error => console.log(error));
-                        });
-						<?php } ?>
-                    </script>
-					<?php
-				}
+                        }
+
+                        if (window.elementorFrontend && window.elementorFrontend.isEditMode()) {
+                            // Elementor editor context
+                            if ("<?php echo esc_js($doc_type); ?>" === 'pdf') {
+                                embedPDF();
+                            } else if ("<?php echo esc_js($doc_type); ?>" === 'markdown') {
+                                renderMarkdown();
+                            } else if ("<?php echo esc_js($doc_type); ?>" === 'docx') {
+                                renderDocx();
+                            } else if ("<?php echo esc_js($doc_type); ?>" === 'excel') {
+                                renderExcel();
+                            }
+                        } else {
+                            // Frontend context
+                            document.addEventListener("DOMContentLoaded", function() {
+                                if ("<?php echo esc_js($doc_type); ?>" === 'pdf') {
+                                    embedPDF();
+                                } else if ("<?php echo esc_js($doc_type); ?>" === 'markdown') {
+                                    renderMarkdown();
+                                } else if ("<?php echo esc_js($doc_type); ?>" === 'docx') {
+                                    renderDocx();
+                                } else if ("<?php echo esc_js($doc_type); ?>" === 'excel') {
+                                    renderExcel();
+                                }
+                            });
+                        }
+                    })();
+                </script>
+				<?php
 			}
 			if ('yes' === $show_download_button) {
 				echo "<p class='dv-btn-container'><a href='$doc_url' target='_blank' class='wp-block-file__button' download=''>$download_button_text</a></p>";
