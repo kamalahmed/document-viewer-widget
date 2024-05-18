@@ -1,0 +1,15 @@
+{
+  "name": "document-viewer-widget",
+  "version": "1.0.0",
+  "description": "A custom Gutenberg block to upload and display PDF, Markdown, DOCX, and Excel files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Kamal Ahmed",
+  "license": "ISC",
+  "devDependencies": {
+    "@wordpress/scripts": "^27.9.0"
+  }
+}
