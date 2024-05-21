@@ -12,7 +12,21 @@ $doc_url =  $attributes['docUrl'] ?? '';
 $show_download_button = $attributes['showDownloadButton'] ?? '';
 $download_button_text = $attributes['downloadButtonText'] ?? '';
 $dom_id = 'document-viewer-' . wp_generate_uuid4();
-wp_enqueue_script('dv-pdfobject');
+error_log(print_r($doc_type, true));
+switch ( $doc_type ) {
+	case 'pdf':
+		wp_enqueue_script('dv-pdfobject');
+		break;
+	case 'markdown':
+		wp_enqueue_script('dv-marked');
+	case 'docx':
+		wp_enqueue_script('dv-mammoth');
+		break;
+	case 'excel':
+		wp_enqueue_script('dv-xlsx');
+		break;
+}
+
 ?>
 <div <?php echo get_block_wrapper_attributes(['class'=> 'dv-container']); ?> data-doc-type="<?php echo esc_attr( $doc_type ); ?>" data-doc-url="<?php echo esc_url( $doc_url ); ?>">
 	<!-- Placeholder for rendering the document -->
