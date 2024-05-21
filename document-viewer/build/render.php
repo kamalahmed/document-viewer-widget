@@ -12,7 +12,7 @@ $doc_url =  $attributes['docUrl'] ?? '';
 $show_download_button = $attributes['showDownloadButton'] ?? '';
 $download_button_text = $attributes['downloadButtonText'] ?? '';
 $dom_id = 'document-viewer-' . wp_generate_uuid4();
-error_log(print_r($doc_type, true));
+
 switch ( $doc_type ) {
 	case 'pdf':
 		wp_enqueue_script('dv-pdfobject');
