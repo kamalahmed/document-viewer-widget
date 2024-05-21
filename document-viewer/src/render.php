@@ -13,6 +13,7 @@ $show_download_button = $attributes['showDownloadButton'] ?? '';
 $download_button_text = $attributes['downloadButtonText'] ?? '';
 $dom_id = 'document-viewer-' . wp_generate_uuid4();
 
+// only loads the scripts that is needed for better performance
 switch ( $doc_type ) {
 	case 'pdf':
 		wp_enqueue_script('dv-pdfobject');
@@ -75,10 +76,8 @@ switch ( $doc_type ) {
 			}
 		}
 
-		if (typeof PDFObject !== 'undefined' && typeof marked !== 'undefined' && typeof mammoth !== 'undefined' && typeof XLSX !== 'undefined') {
-			renderDocument();
-		} else {
-			document.addEventListener("DOMContentLoaded", renderDocument);
-		}
+
+		document.addEventListener("DOMContentLoaded", renderDocument);
+
 	})();
 </script>
