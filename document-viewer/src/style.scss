@@ -4,7 +4,9 @@
  *
  * Replace them with your own styles or remove the file completely.
  */
-
+.dv-container{
+	text-align: center;
+}
 .dv-container .pdfobject-container {
 	max-height: 80vh;
 	height: 700px;
@@ -22,6 +24,7 @@
 	background: blue;
 	color: #fff;
 	border-radius: 5px;
+	margin: 10px auto;
 }
 
 /* General styling for code blocks */

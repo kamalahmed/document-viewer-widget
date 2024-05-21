@@ -66,11 +66,11 @@ const Edit = ({ attributes, setAttributes }) => {
 					/>
 				)}
 				{docUrl && (
-					<div className="document-viewer-preview">
+					<div className="document-viewer-preview dv-container">
 						{fileIcons[docType]}
 						<p className="document-note">{__('Document will be rendered in the frontend.', 'document-viewer')}</p>
 						{showDownloadButton && (
-							<div className="download-button-wrap">
+							<div className="dv-btn-container">
 								<a href={docUrl} target="_blank" className="wp-block-file__button"
 								   download>
 									{downloadButtonText}
