@@ -16,6 +16,13 @@ const fileIcons = {
 	docx: <img src={docxIcon} alt="DOCX" style={{ width: '100px', height: '130px' }} />,
 	excel: <img src={excelIcon} alt="Excel" style={{ width: '100px', height: '130px' }} />,
 };
+// excel and docx has long subtype name so make it consistent with other types
+const fileTypes = {
+	"vnd.openxmlformats-officedocument.spreadsheetml.sheet": "excel",
+	"vnd.openxmlformats-officedocument.wordprocessingml.document":"docx",
+	pdf:"pdf",
+	markdown:"markdown",
+}
 
 const Edit = ({ attributes, setAttributes }) => {
 	const { docType, docUrl, showDownloadButton, downloadButtonText } = attributes;
@@ -41,7 +48,9 @@ const Edit = ({ attributes, setAttributes }) => {
 			<div { ...useBlockProps() }>
 				{!docUrl && (
 					<MediaUpload
-						onSelect={(media) => setAttributes({ docUrl: media.url, docType: media.subtype })}
+						onSelect={(media) => {
+							setAttributes({docUrl: media.url, docType: fileTypes[media.subtype]})
+						}}
 						allowedTypes={[
 							'application/pdf',
 							'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -51,7 +60,7 @@ const Edit = ({ attributes, setAttributes }) => {
 						]}
 						render={({ open }) => (
 							<Button onClick={open} isPrimary>
-								{__('Select Document', 'document-viewer')}
+								{__('Select a Document', 'document-viewer')}
 							</Button>
 						)}
 					/>
@@ -60,7 +69,17 @@ const Edit = ({ attributes, setAttributes }) => {
 					<div className="document-viewer-preview">
 						{fileIcons[docType]}
 						<p className="document-note">{__('Document will be rendered in the frontend.', 'document-viewer')}</p>
-						<Button onClick={() => setAttributes({ docUrl: '', docType: '' })} isSecondary>
+						{showDownloadButton && (
+							<div className="download-button-wrap">
+								<a href={docUrl} target="_blank" className="wp-block-file__button"
+								   download>
+									{downloadButtonText}
+								</a>
+							</div>
+
+						)}
+
+						<Button onClick={() => setAttributes({docUrl: '', docType: ''})} isSecondary>
 							{__('Remove Document', 'document-viewer')}
 						</Button>
 					</div>
