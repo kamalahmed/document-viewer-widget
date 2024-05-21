@@ -1,27 +1,21 @@
-/**
- * Retrieves the translation of text.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * React hook that is used to mark the block wrapper element.
- * It provides all the necessary props like the class name.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
- */
 import { useBlockProps, InspectorControls, MediaUpload } from '@wordpress/block-editor';
-
-/**
- * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
- * Those files can contain any CSS code that gets applied to the editor.
- *
- * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
- */
+import { Button, PanelBody, ToggleControl, TextControl } from '@wordpress/components';
 import './editor.scss';
 
-import { PanelBody, SelectControl, ToggleControl, TextControl, Button } from '@wordpress/components';
+// Import SVG files
+import pdfIcon from './assets/pdf.svg';
+import markdownIcon from './assets/markdown.svg';
+import docxIcon from './assets/docx.svg';
+import excelIcon from './assets/excel.svg';
+
+// SVG icons for each document type
+const fileIcons = {
+	pdf: <img src={pdfIcon} alt="PDF" style={{ width: '100px', height: '130px' }} />,
+	markdown: <img src={markdownIcon} alt="Markdown" style={{ width: '100px', height: '130px' }} />,
+	docx: <img src={docxIcon} alt="DOCX" style={{ width: '100px', height: '130px' }} />,
+	excel: <img src={excelIcon} alt="Excel" style={{ width: '100px', height: '130px' }} />,
+};
 
 const Edit = ({ attributes, setAttributes }) => {
 	const { docType, docUrl, showDownloadButton, downloadButtonText } = attributes;
@@ -30,30 +24,6 @@ const Edit = ({ attributes, setAttributes }) => {
 		<>
 			<InspectorControls>
 				<PanelBody title={__('Document Viewer Settings', 'document-viewer')}>
-					<SelectControl
-						label={__('Document Type', 'document-viewer')}
-						value={docType}
-						options={[
-							{ label: __('PDF', 'document-viewer'), value: 'pdf' },
-							{ label: __('Markdown', 'document-viewer'), value: 'markdown' },
-							{ label: __('DOCX', 'document-viewer'), value: 'docx' },
-							{ label: __('Excel', 'document-viewer'), value: 'excel' }
-						]}
-						onChange={(newDocType) => setAttributes({ docType: newDocType })}
-					/>
-					<MediaUpload
-						onSelect={(media) => setAttributes({ docUrl: media.url })}
-						allowedTypes={[
-							'application/pdf',
-							'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-							'text/markdown',
-							'text/plain'
-						]}
-						render={({ open }) => (
-							<Button onClick={open} isPrimary>{__('Select Document', 'document-viewer')}</Button>
-						)}
-					/>
 					<ToggleControl
 						label={__('Show Download Button', 'document-viewer')}
 						checked={showDownloadButton}
@@ -69,8 +39,32 @@ const Edit = ({ attributes, setAttributes }) => {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
-				{__('Document Viewer', 'document-viewer')}
-				{docUrl && <p>{__('Document URL:', 'document-viewer')} {docUrl}</p>}
+				{!docUrl && (
+					<MediaUpload
+						onSelect={(media) => setAttributes({ docUrl: media.url, docType: media.subtype })}
+						allowedTypes={[
+							'application/pdf',
+							'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+							'text/markdown',
+							'text/plain'
+						]}
+						render={({ open }) => (
+							<Button onClick={open} isPrimary>
+								{__('Select Document', 'document-viewer')}
+							</Button>
+						)}
+					/>
+				)}
+				{docUrl && (
+					<div className="document-viewer-preview">
+						{fileIcons[docType]}
+						<p className="document-note">{__('Document will be rendered in the frontend.', 'document-viewer')}</p>
+						<Button onClick={() => setAttributes({ docUrl: '', docType: '' })} isSecondary>
+							{__('Remove Document', 'document-viewer')}
+						</Button>
+					</div>
+				)}
 			</div>
 		</>
 	);

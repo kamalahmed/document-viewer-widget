@@ -5,5 +5,12 @@
  */
 
 .wp-block-create-block-document-viewer {
-	border: 1px dotted #f00;
+	border: 1px dotted #0647fd;
+	padding: 20px;
+}
+.wp-block-create-block-document-viewer p {
+	margin: 0 0 10px 0;
+	font-size: 16px;
+	font-style: italic;
+	line-height: 1;
 }

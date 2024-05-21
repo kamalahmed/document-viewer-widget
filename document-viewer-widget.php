@@ -152,7 +152,7 @@ final class Document_Viewer_Widget {
 	}
 
 	public function register_gutenberg_block() {
-		register_block_type( DV_PLUGIN_DIR_PATH . 'document-viewer/build/block.json' );
+		register_block_type( DV_PLUGIN_DIR_PATH . 'document-viewer/build' );
 	}
 
 	public function register_scripts_and_styles() {
