@@ -4,9 +4,10 @@
 	"name": "create-block/document-viewer",
 	"version": "0.1.0",
 	"title": "Document Viewer",
-	"category": "widgets",
+	"category": "embed",
 	"icon": "media-document",
-	"description": "A block to view documents such as PDF, Markdown, DOCX, and Excel.",
+	"description": "A block to view|render documents such as PDF, Markdown, DOCX, and Excel on your website.",
+	"keywords": [ "pdf", "excel", "document","docx", "microsoft","markdown","md","text","file","embed","document","xlsx", "viewer", "reader" ],
 	"example": {},
 	"supports": {
 		"html": false
