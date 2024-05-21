@@ -25,12 +25,17 @@ const fileTypes = {
 }
 
 const Edit = ({ attributes, setAttributes }) => {
-	const { docType, docUrl, showDownloadButton, downloadButtonText } = attributes;
+	const { docType, docUrl, showDownloadButton, downloadButtonText, showDocument } = attributes;
 
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={__('Document Viewer Settings', 'document-viewer')}>
+					<ToggleControl
+						label={__('Show|Render Document', 'document-viewer')}
+						checked={showDocument}
+						onChange={(newShowDocument) => setAttributes({ showDocument: newShowDocument })}
+					/>
 					<ToggleControl
 						label={__('Show Download Button', 'document-viewer')}
 						checked={showDownloadButton}
@@ -68,7 +73,9 @@ const Edit = ({ attributes, setAttributes }) => {
 				{docUrl && (
 					<div className="document-viewer-preview dv-container">
 						{fileIcons[docType]}
-						<p className="document-note">{__('Document will be rendered in the frontend.', 'document-viewer')}</p>
+						{showDocument &&
+							<p className="document-note">{__('Document will be rendered in the frontend.', 'document-viewer')}</p> }
+
 						{showDownloadButton && (
 							<div className="dv-btn-container">
 								<a href={docUrl} target="_blank" className="wp-block-file__button"

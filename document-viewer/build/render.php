@@ -9,29 +9,36 @@
 
 $doc_type = $attributes['docType'] ?? '';
 $doc_url =  $attributes['docUrl'] ?? '';
+$show_document = $attributes['showDocument'] ?? '';
 $show_download_button = $attributes['showDownloadButton'] ?? '';
 $download_button_text = $attributes['downloadButtonText'] ?? '';
 $dom_id = 'document-viewer-' . wp_generate_uuid4();
 
 // only loads the scripts that is needed for better performance
-switch ( $doc_type ) {
-	case 'pdf':
-		wp_enqueue_script('dv-pdfobject');
-		break;
-	case 'markdown':
-		wp_enqueue_script('dv-marked');
-	case 'docx':
-		wp_enqueue_script('dv-mammoth');
-		break;
-	case 'excel':
-		wp_enqueue_script('dv-xlsx');
-		break;
+if ( $doc_url && $show_document ) {
+	switch ( $doc_type ) {
+		case 'pdf':
+			wp_enqueue_script('dv-pdfobject');
+			break;
+		case 'markdown':
+			wp_enqueue_script('dv-marked');
+		case 'docx':
+			wp_enqueue_script('dv-mammoth');
+			break;
+		case 'excel':
+			wp_enqueue_script('dv-xlsx');
+			break;
+	}
 }
+
 
 ?>
 <div <?php echo get_block_wrapper_attributes(['class'=> 'dv-container']); ?> data-doc-type="<?php echo esc_attr( $doc_type ); ?>" data-doc-url="<?php echo esc_url( $doc_url ); ?>">
-	<!-- Placeholder for rendering the document -->
-	<div id="<?php echo esc_attr($dom_id); ?>"></div>
+	<?php if ( $doc_url && $show_document ) { ?>
+		<!-- Placeholder for rendering the document -->
+		<div id="<?php echo esc_attr($dom_id); ?>"></div>
+	<?php } ?>
+
 	<?php if ( $show_download_button ) : ?>
 		<p class="dv-btn-container">
 			<a href="<?php echo esc_url( $doc_url ); ?>" target="_blank" class="wp-block-file__button" download>
@@ -40,6 +47,7 @@ switch ( $doc_type ) {
 		</p>
 	<?php endif; ?>
 </div>
+<?php if ( $doc_url && $show_document ) { ?>
 <script>
 	(function() {
 		const domId = '<?php echo esc_js($dom_id); ?>';
@@ -81,3 +89,4 @@ switch ( $doc_type ) {
 
 	})();
 </script>
+<?php } ?>

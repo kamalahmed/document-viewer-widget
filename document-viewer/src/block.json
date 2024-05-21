@@ -25,6 +25,10 @@
 			"type": "string",
 			"default": ""
 		},
+		"showDocument": {
+			"type": "boolean",
+			"default": true
+		},
 		"showDownloadButton": {
 			"type": "boolean",
 			"default": true
