@@ -79,6 +79,10 @@ build/Release
 node_modules/
 jspm_packages/
 
+# composer package
+vendor/
+
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
